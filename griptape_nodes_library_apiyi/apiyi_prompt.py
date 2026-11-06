@@ -12,6 +12,7 @@ from griptape_nodes.exe_types.param_types.parameter_string import ParameterStrin
 from griptape_nodes.traits.options import Options
 
 from griptape_nodes_library_apiyi.apiyi_client import API_KEY_NAME, gateway_url, missing_key_error, read_secret
+from griptape_nodes_library_apiyi.apiyi_model_catalog import CHAT_MODELS
 
 __all__ = ["ApiyiPrompt"]
 
@@ -21,41 +22,7 @@ PROMPT_MODEL_CONFIG_PARAMETER = "prompt_model_config"
 # The Agent node reads this provider as an OpenAI-compatible host at `base_url`.
 OPENAI_COMPATIBLE_PROVIDER = "openai_compatible"
 
-CHAT_MODELS = [
-    "claude-fable-5-1",
-    "claude-opus-5-5",
-    "claude-sonnet-5-5",
-    "claude-haiku-5-5",
-    "gpt-6.1-sol",
-    "gpt-6.1-terra",
-    "gpt-6-astra",
-    "gpt-6-luna",
-    "gpt-5.6-sol",
-    "gpt-5.6-terra",
-    "gpt-5.6-luna",
-    "gpt-5.5",
-    "gpt-5.4",
-    "gpt-4.1",
-    "gpt-4o-mini",
-    "gemini-4-argon",
-    "gemini-3.8-flash",
-    "gemini-3.7-flash",
-    "gemini-3.6-flash",
-    "gemini-3.5-flash",
-    "gemini-3.1-pro-preview",
-    "grok-4.7",
-    "grok-4.6",
-    "grok-4.5",
-    "deepseek-v4-pro",
-    "deepseek-v4.1-flash",
-    "qwen3.8-max",
-    "qwen3.8-flash",
-    "glm-5.3",
-    "kimi-k3.1-pro",
-    "MiniMax-M3",
-    "seed-2-0-pro-260328",
-]
-DEFAULT_MODEL = CHAT_MODELS[0]
+DEFAULT_MODEL = "claude-fable-5-1"
 # Below zero means "do not send a temperature". Newer Claude and GPT models refuse the field with a 400.
 UNSET_TEMPERATURE = -1.0
 # Agent checks for a Griptape Cloud credential before a workflow runs, which is before this node has

@@ -14,6 +14,7 @@ from griptape_nodes.traits.options import Options
 
 from griptape_nodes_library_apiyi.apiyi_client import ApiyiRequest
 from griptape_nodes_library_apiyi.apiyi_image_node import GENERATIONS_PATH, ApiyiImageNode
+from griptape_nodes_library_apiyi.apiyi_model_catalog import FLUX_MODELS
 
 __all__ = ["ApiyiFlux"]
 
@@ -39,7 +40,7 @@ AUTO_RATIO = "auto"
 class ApiyiFlux(ApiyiImageNode):
     """Generate or edit images with FLUX models through APIYI."""
 
-    MODEL_CHOICES: ClassVar[list[str]] = list(MODEL_INPUT_LIMITS)
+    MODEL_CHOICES: ClassVar[list[str]] = FLUX_MODELS
     DEFAULT_MODEL: ClassVar[str] = "flux-2-pro"
     MAX_INPUT_IMAGES: ClassVar[int] = 8
     DEFAULT_FILENAME: ClassVar[str] = "apiyi_flux.jpg"

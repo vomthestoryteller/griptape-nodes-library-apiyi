@@ -22,27 +22,18 @@ from griptape_nodes.traits.options import Options
 from griptape_nodes_library_apiyi.apiyi_client import ApiyiRequest
 from griptape_nodes_library_apiyi.apiyi_image_node import EDITS_PATH, GENERATIONS_PATH, ApiyiImageNode
 from griptape_nodes_library_apiyi.apiyi_images import prepare_mask, read_image
+from griptape_nodes_library_apiyi.apiyi_model_catalog import GPT_IMAGE_MODELS
 
 __all__ = ["ApiyiGptImage", "GptLine", "line_of"]
-
-MODEL_CHOICES = [
-    "gpt-image-2.5-flare",
-    "gpt-image-2.5-sunburst",
-    "gpt-image-2.6-flare",
-    "gpt-image-2.6-sunburst",
-    "gpt-image-2",
-    "gpt-image-2.5-vip",
-    "gpt-image-2.5-flare-vip",
-    "gpt-image-2.5-sunburst-vip",
-    "gpt-image-2-vip",
-    "gpt-image-2.5-all",
-    "gpt-image-2-all",
-]
 
 # `xhigh`, `max`, and transparent backgrounds start at these model versions.
 NEWER_MODEL_PREFIXES = ("gpt-image-2.5", "gpt-image-2.6")
 COMPLEXITY_MODEL_PREFIX = "gpt-image-2.6"
+# The first models have fewer sizes, and only `gpt-image-1` has the edit endpoint.
+FIRST_MODELS_PREFIX = "gpt-image-1"
+FIRST_MODEL_WITH_EDITS = "gpt-image-1"
 
+FIRST_MODEL_SIZES = ["1024x1024", "1536x1024", "1024x1536", "auto"]
 OFFICIAL_SIZES = ["1024x1024", "1536x1024", "1024x1536", "2048x2048", "2048x1152", "3840x2160", "2160x3840", "auto"]
 # The -vip lines rewrite a size outside this table, so the dropdown offers the table.
 VIP_SIZES = [
@@ -105,10 +96,20 @@ def line_of(model: str) -> GptLine:
     return GptLine.OFFICIAL
 
 
+def _has_edits(model: str) -> bool:
+    return not model.startswith(FIRST_MODELS_PREFIX) or model == FIRST_MODEL_WITH_EDITS
+
+
+def _sizes(line: GptLine, *, first: bool) -> list[str]:
+    if line is GptLine.VIP:
+        return VIP_SIZES
+    return FIRST_MODEL_SIZES if first else OFFICIAL_SIZES
+
+
 class ApiyiGptImage(ApiyiImageNode):
     """Generate or edit images with GPT Image models through APIYI."""
 
-    MODEL_CHOICES: ClassVar[list[str]] = MODEL_CHOICES
+    MODEL_CHOICES: ClassVar[list[str]] = GPT_IMAGE_MODELS
     DEFAULT_MODEL: ClassVar[str] = "gpt-image-2.5-flare"
     MAX_INPUT_IMAGES: ClassVar[int] = 16
     DEFAULT_FILENAME: ClassVar[str] = "apiyi_gpt_image.png"
@@ -191,17 +192,19 @@ class ApiyiGptImage(ApiyiImageNode):
         line = line_of(model)
         official = line is GptLine.OFFICIAL
         self._show(["size", "quality"], visible=line is not GptLine.ALL)
-        self._show(["mask", "output_format", "background", "moderation"], visible=official)
+        self._show(["output_format", "background", "moderation"], visible=official)
+        self._show(["mask"], visible=official and _has_edits(model))
         self._show(["complexity"], visible=official and model.startswith(COMPLEXITY_MODEL_PREFIX))
         self._sync_compression_visibility(model)
         if line is GptLine.ALL:
             return
 
+        first = model.startswith(FIRST_MODELS_PREFIX)
         newer = model.startswith(NEWER_MODEL_PREFIXES)
-        self._offer_choices("size", VIP_SIZES if line is GptLine.VIP else OFFICIAL_SIZES)
+        self._offer_choices("size", _sizes(line, first=first))
         self._offer_choices("quality", EXTENDED_QUALITIES if newer else BASE_QUALITIES)
         if official:
-            self._offer_choices("background", EXTENDED_BACKGROUNDS if newer else BASE_BACKGROUNDS)
+            self._offer_choices("background", EXTENDED_BACKGROUNDS if newer or first else BASE_BACKGROUNDS)
 
     def _on_value_changed(self, name: str, value: Any) -> None:
         super()._on_value_changed(name, value)
@@ -213,6 +216,9 @@ class ApiyiGptImage(ApiyiImageNode):
         visible = line_of(model) is GptLine.OFFICIAL and output_format in FORMATS_WITH_COMPRESSION
         self._show(["output_compression"], visible=visible)
 
+    def _input_image_limit(self, model: str) -> int:
+        return self.MAX_INPUT_IMAGES if _has_edits(model) else 0
+
     def _validate_settings(self, model: str, image_count: int) -> list[Exception]:
         if line_of(model) is not GptLine.OFFICIAL:
             return []
@@ -222,7 +228,7 @@ class ApiyiGptImage(ApiyiImageNode):
             problems.append(
                 NodeError(f"A transparent 'Background' needs PNG or WEBP. 'Output Format' is {output_format}.")
             )
-        if self.get_parameter_value("mask") and image_count == 0:
+        if _has_edits(model) and self.get_parameter_value("mask") and image_count == 0:
             problems.append(NodeError("'Mask' applies to the first input image. Connect an image to 'Input Images'."))
         return problems
 

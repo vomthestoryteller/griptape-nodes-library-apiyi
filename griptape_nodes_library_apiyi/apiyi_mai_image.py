@@ -15,10 +15,10 @@ from griptape_nodes.traits.options import Options
 
 from griptape_nodes_library_apiyi.apiyi_client import ApiyiRequest
 from griptape_nodes_library_apiyi.apiyi_image_node import EDITS_PATH, GENERATIONS_PATH, ApiyiImageNode
+from griptape_nodes_library_apiyi.apiyi_model_catalog import MAI_IMAGE_MODELS
 
 __all__ = ["ApiyiMaiImage"]
 
-MODEL_CHOICES = ["MAI-Image-2.6", "MAI-Image-2.6-Flash"]
 SIZES = ["1024x1024", "1536x1536", "1536x1024", "1024x1536", "1792x1008", "1008x1792", "3072x768"]
 SIZE_PATTERN = re.compile(r"(\d+)x(\d+)")
 MIN_EDGE = 768
@@ -33,8 +33,8 @@ def _dimensions(size: Any) -> tuple[int, int] | None:
 class ApiyiMaiImage(ApiyiImageNode):
     """Generate or edit images with MAI-Image models through APIYI."""
 
-    MODEL_CHOICES: ClassVar[list[str]] = MODEL_CHOICES
-    DEFAULT_MODEL: ClassVar[str] = MODEL_CHOICES[0]
+    MODEL_CHOICES: ClassVar[list[str]] = MAI_IMAGE_MODELS
+    DEFAULT_MODEL: ClassVar[str] = "MAI-Image-2.6"
     MAX_INPUT_IMAGES: ClassVar[int] = 5
     DEFAULT_FILENAME: ClassVar[str] = "apiyi_mai_image.png"
 

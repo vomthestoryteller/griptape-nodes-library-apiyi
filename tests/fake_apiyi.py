@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 import threading
 from collections import deque
 from dataclasses import dataclass, field
@@ -25,7 +26,14 @@ def image_bytes(image_format: str = "PNG", size: tuple[int, int] = (32, 32), mod
 OUTPUT_PNG = image_bytes("PNG")
 OUTPUT_JPEG = image_bytes("JPEG")
 DRAFT_PNG = image_bytes("PNG", (8, 8))
+# The start of an MP4 file. The engine reads these bytes to check the file extension.
+OUTPUT_MP4 = b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isommp42" + b"\x00" * 64
 CHAT_REPLY = "Hello from the fake APIYI"
+VIDEO_TASK_ID = "video_test"
+SEEDANCE_TASK_ID = "cgt-test"
+SEEDANCE_TASKS_PATH = "/seedance/api/v3/contents/generations/tasks"
+VIDEO_FILE_PATH = "/files/out.mp4"
+TASK_READ = re.compile(rf"(/v1/videos|{SEEDANCE_TASKS_PATH})/([^/]+)")
 
 
 @dataclass
@@ -50,11 +58,16 @@ class RecordedRequest:
 
 
 class FakeApiyi:
-    """Answers like APIYI. Queue an answer with `answer_next` to replace the default one."""
+    """Answers like APIYI.
+
+    Queue an answer with `answer_next` to replace the default answer of a POST, and with `answer_next_read`
+    to replace the default answer of a GET.
+    """
 
     def __init__(self) -> None:
         self.requests: list[RecordedRequest] = []
         self._queued: deque[tuple[int, Any]] = deque()
+        self._queued_reads: deque[tuple[int, Any]] = deque()
         fake = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -63,7 +76,16 @@ class FakeApiyi:
 
             def do_GET(self) -> None:  # noqa: N802
                 fake.requests.append(RecordedRequest("GET", self.path, self.headers))
-                self._reply(200, OUTPUT_JPEG, "image/jpeg")
+                if fake._queued_reads:
+                    status, answer = fake._queued_reads.popleft()
+                    content = answer if isinstance(answer, bytes) else json.dumps(answer).encode()
+                    self._reply(status, content, "application/json")
+                elif self.path.endswith("/content") or self.path == VIDEO_FILE_PATH:
+                    self._reply(200, OUTPUT_MP4, "video/mp4")
+                elif match := TASK_READ.fullmatch(self.path):
+                    self._reply(200, json.dumps(fake._finished_task(*match.groups())).encode(), "application/json")
+                else:
+                    self._reply(200, OUTPUT_JPEG, "image/jpeg")
 
             def do_POST(self) -> None:  # noqa: N802
                 body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
@@ -92,6 +114,9 @@ class FakeApiyi:
     def answer_next(self, status: int, body: Any) -> None:
         self._queued.append((status, body))
 
+    def answer_next_read(self, status: int, body: Any) -> None:
+        self._queued_reads.append((status, body))
+
     @property
     def posts(self) -> list[RecordedRequest]:
         return [request for request in self.requests if request.method == "POST"]
@@ -100,16 +125,30 @@ class FakeApiyi:
     def last_post(self) -> RecordedRequest:
         return self.posts[-1]
 
+    @property
+    def reads(self) -> list[RecordedRequest]:
+        return [request for request in self.requests if request.method == "GET"]
+
     def _answer(self, path: str, request: RecordedRequest) -> tuple[int, Any]:
         if self._queued:
             return self._queued.popleft()
         if ":generateContent" in path:
             return 200, _gemini_answer()
+        if path == "/v1/videos":
+            return 200, {"id": VIDEO_TASK_ID, "status": "queued"}
+        if path == SEEDANCE_TASKS_PATH:
+            return 200, {"id": SEEDANCE_TASK_ID}
         model = (request.json or request.form).get("model", "")
         if model.startswith("flux"):
             return 200, {"created": 1, "data": [{"url": f"{self.url}/files/out.jpeg?signature=abc"}]}
         count = ((request.json or {}).get("sequential_image_generation_options") or {}).get("max_images", 1)
         return 200, {"created": 1, "data": [{"b64_json": _b64(OUTPUT_PNG)} for _ in range(count)]}
+
+    def _finished_task(self, tasks_path: str, task_id: str) -> dict[str, Any]:
+        link = f"{self.url}{VIDEO_FILE_PATH}"
+        if tasks_path == SEEDANCE_TASKS_PATH:
+            return {"id": task_id, "status": "succeeded", "content": {"video_url": link}}
+        return {"id": task_id, "status": "completed", "progress": 100, "video_url": link}
 
 
 def _chat_stream(model: str) -> bytes:

@@ -3,6 +3,26 @@
 This file follows [Keep a Changelog 2.0.0](https://keepachangelog.com/en/2.0.0/). Each version is the
 `library_version` in `griptape-nodes-library.json`.
 
+## [0.2.0] - 2026-11-06
+
+### Added
+
+- `APIYI Oxygen`, `APIYI Veo`, `APIYI Grok Video`, and `APIYI Seedance` generate videos through APIYI.
+- A video node keeps its task ID. `Refresh / Retrieve Result` collects a video after a timeout, after a failed
+  download, and after a workflow load.
+- The optional secrets `APIYI_GROK_API_KEY` and `APIYI_SEEDANCE_API_KEY` hold tokens in special groups.
+- `scripts/sync_models.py` updates the model dropdowns from the APIYI model registry.
+- `APIYI Prompt` offers all 188 chat models in the registry. The list starts with the same 32 models.
+- `APIYI GPT Image` offers `gpt-image-1`, `gpt-image-1.5`, `gpt-image-1-mini`, and three dated models.
+- `APIYI Nano Banana` offers the Gemini 2.5 image models and the aliases of the other models.
+
+### Fixed
+
+- Image lists use the item converters of the engine. The engine ignored the old value hook, and logged a warning
+  for each new item.
+- A status 200 with an unreadable answer no longer tells you to run the node again, because APIYI can bill that
+  request.
+
 ## [0.1.2] - 2026-11-06
 
 ### Fixed

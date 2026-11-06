@@ -3,19 +3,21 @@
     "library_schema_version": "0.14.0",
     "settings": [
         {
-            "description": "API key for the nodes in this library. Get it at https://api.apiyi.com/token",
+            "description": "API keys for the nodes in this library. Get them at https://api.apiyi.com/token. APIYI_GROK_API_KEY and APIYI_SEEDANCE_API_KEY are optional: use them for tokens in the GrokOfficial and SeeDance2 groups. These nodes use APIYI_API_KEY when their own key is empty.",
             "category": "app_events.on_app_initialization_complete",
             "contents": {
                 "secrets_to_register": {
-                    "APIYI_API_KEY": ""
+                    "APIYI_API_KEY": "",
+                    "APIYI_GROK_API_KEY": "",
+                    "APIYI_SEEDANCE_API_KEY": ""
                 }
             }
         }
     ],
     "metadata": {
         "author": "vomthestoryteller",
-        "description": "Chat models and image generation through the APIYI model gateway.",
-        "library_version": "0.1.2",
+        "description": "Chat models, image generation, and video generation through the APIYI model gateway.",
+        "library_version": "0.2.0",
         "engine_version": "0.105.0",
         "tags": [
             "Griptape",
@@ -41,6 +43,14 @@
                 "title": "Image",
                 "description": "APIYI image generation and editing",
                 "icon": "Image"
+            }
+        },
+        {
+            "video": {
+                "color": "border-pink-500",
+                "title": "Video",
+                "description": "APIYI video generation",
+                "icon": "Video"
             }
         }
     ],
@@ -109,6 +119,50 @@
                 "display_name": "APIYI MAI-Image",
                 "tags": ["image", "generation", "edit", "mai-image", "apiyi"],
                 "icon": "Image"
+            }
+        },
+        {
+            "class_name": "ApiyiOxygen",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_oxygen.py",
+            "metadata": {
+                "category": "video",
+                "description": "Generate videos with Oxygen through APIYI. Supports first and last frames, and reference files.",
+                "display_name": "APIYI Oxygen",
+                "tags": ["video", "generation", "oxygen", "apiyi"],
+                "icon": "Video"
+            }
+        },
+        {
+            "class_name": "ApiyiVeo",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_veo.py",
+            "metadata": {
+                "category": "video",
+                "description": "Generate videos with Google Veo 3.1 through APIYI. Supports a first frame.",
+                "display_name": "APIYI Veo",
+                "tags": ["video", "generation", "veo", "google", "apiyi"],
+                "icon": "Video"
+            }
+        },
+        {
+            "class_name": "ApiyiGrokVideo",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_grok_video.py",
+            "metadata": {
+                "category": "video",
+                "description": "Generate videos with xAI Grok Imagine Video through APIYI. Needs the GrokOfficial token group.",
+                "display_name": "APIYI Grok Video",
+                "tags": ["video", "generation", "grok", "xai", "apiyi"],
+                "icon": "Video"
+            }
+        },
+        {
+            "class_name": "ApiyiSeedance",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_seedance.py",
+            "metadata": {
+                "category": "video",
+                "description": "Generate videos with ByteDance Seedance through APIYI. Needs the SeeDance2 token group.",
+                "display_name": "APIYI Seedance",
+                "tags": ["video", "generation", "seedance", "bytedance", "apiyi"],
+                "icon": "Video"
             }
         }
     ]

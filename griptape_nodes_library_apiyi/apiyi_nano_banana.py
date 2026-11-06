@@ -13,6 +13,7 @@ from griptape_nodes.traits.options import Options
 from griptape_nodes_library_apiyi.apiyi_client import ApiyiRequest
 from griptape_nodes_library_apiyi.apiyi_image_node import ApiyiImageNode
 from griptape_nodes_library_apiyi.apiyi_images import decode_b64
+from griptape_nodes_library_apiyi.apiyi_model_catalog import NANO_BANANA_MODELS
 
 __all__ = ["ApiyiNanoBanana"]
 
@@ -28,11 +29,29 @@ class NanoBananaSpec:
     aspect_ratios: tuple[str, ...]
 
 
+PRO_SPEC = NanoBananaSpec(("1K", "2K", "4K"), RATIOS_10)
+FLASH_SPEC = NanoBananaSpec(("512", "1K", "2K", "4K"), RATIOS_14)
+FIRST_GENERATION_SPEC = NanoBananaSpec(("1K",), RATIOS_10)
+
 MODEL_SPECS = {
     "gemini-nano-banana-2.1": NanoBananaSpec(("1K", "2K", "4K"), RATIOS_14),
-    "gemini-3-pro-image": NanoBananaSpec(("1K", "2K", "4K"), RATIOS_10),
-    "gemini-3.1-flash-image": NanoBananaSpec(("512", "1K", "2K", "4K"), RATIOS_14),
+    "gemini-3-pro-image": PRO_SPEC,
+    "gemini-3.1-flash-image": FLASH_SPEC,
     "gemini-3.1-flash-lite-image": NanoBananaSpec(("1K",), RATIOS_14),
+    "gemini-2.5-flash-image": FIRST_GENERATION_SPEC,
+    "gemini-2.5-flash-image-preview": FIRST_GENERATION_SPEC,
+    # Aliases in the APIYI documents.
+    "gemini-3-pro-image-preview": PRO_SPEC,
+    "gemini-3.1-flash-image-preview": FLASH_SPEC,
+    # The documents do not describe the models below. These entries come from their names and their prices.
+    "gemini-3-pro-image-preview-1k": NanoBananaSpec(("1K",), RATIOS_10),
+    "gemini-3-pro-image-preview-2k": NanoBananaSpec(("2K",), RATIOS_10),
+    "gemini-3-pro-image-preview-4k": NanoBananaSpec(("4K",), RATIOS_10),
+    "gemini-3.1-flash-image-4k": NanoBananaSpec(("4K",), RATIOS_14),
+    "gemini-3.1-flash-image-preview-4k": NanoBananaSpec(("4K",), RATIOS_14),
+    "nano-banana": FIRST_GENERATION_SPEC,
+    "nano-banana-2": FLASH_SPEC,
+    "nano-banana-pro": PRO_SPEC,
 }
 DEFAULT_MODEL = "gemini-nano-banana-2.1"
 
@@ -76,7 +95,7 @@ def _no_image_error(body: dict[str, Any]) -> NodeError:
 class ApiyiNanoBanana(ApiyiImageNode):
     """Generate or edit images with Nano Banana models through APIYI."""
 
-    MODEL_CHOICES: ClassVar[list[str]] = list(MODEL_SPECS)
+    MODEL_CHOICES: ClassVar[list[str]] = NANO_BANANA_MODELS
     DEFAULT_MODEL: ClassVar[str] = DEFAULT_MODEL
     MAX_INPUT_IMAGES: ClassVar[int] = 14
     DEFAULT_FILENAME: ClassVar[str] = "apiyi_nano_banana.png"

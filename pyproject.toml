@@ -1,6 +1,6 @@
 [project]
 name = "griptape_nodes_library_apiyi"
-version = "0.1.2"
+version = "0.2.0"
 description = "Griptape Nodes library for the APIYI model gateway"
 readme = "README.md"
 license = "Apache-2.0"

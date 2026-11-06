@@ -25,7 +25,7 @@ from griptape_nodes.retained_mode.events.library_events import (
 )
 from griptape_nodes.retained_mode.events.node_events import CreateNodeRequest, CreateNodeResultSuccess
 
-from griptape_nodes_library_apiyi import apiyi_client
+from griptape_nodes_library_apiyi import apiyi_client, apiyi_video_node
 
 from .fake_apiyi import FakeApiyi
 
@@ -83,6 +83,18 @@ def engine(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, fake: FakeApiyi) -> 
     finally:
         reset_root_engine()
         LibraryRegistry._clear()
+
+
+@pytest.fixture(autouse=True)
+def pauses(monkeypatch: pytest.MonkeyPatch) -> list[int]:
+    """Record the waits of the video nodes in place of waiting."""
+    recorded: list[int] = []
+
+    async def record(seconds: int) -> None:
+        recorded.append(seconds)
+
+    monkeypatch.setattr(apiyi_video_node, "_pause", record)
+    return recorded
 
 
 @pytest.fixture

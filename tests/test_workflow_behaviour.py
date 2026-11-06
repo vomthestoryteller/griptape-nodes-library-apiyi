@@ -18,13 +18,27 @@ from griptape_nodes.traits.options import Options
 
 from .conftest import FLOW_NAME, create_node, run_node
 
-ALL_NODES = ["ApiyiPrompt", "ApiyiGptImage", "ApiyiNanoBanana", "ApiyiFlux", "ApiyiSeedream", "ApiyiMaiImage"]
+ALL_NODES = [
+    "ApiyiPrompt",
+    "ApiyiGptImage",
+    "ApiyiNanoBanana",
+    "ApiyiFlux",
+    "ApiyiSeedream",
+    "ApiyiMaiImage",
+    "ApiyiOxygen",
+    "ApiyiVeo",
+    "ApiyiGrokVideo",
+    "ApiyiSeedance",
+]
 # A model that changes the dropdowns, and a parameter value that only this model accepts.
 MODEL_ONLY_VALUES = [
     ("ApiyiGptImage", "gpt-image-2-vip", "size", "2048x1360"),
     ("ApiyiNanoBanana", "gemini-3.1-flash-image", "image_size", "512"),
     ("ApiyiNanoBanana", "gemini-3.1-flash-image", "aspect_ratio", "8:1"),
     ("ApiyiSeedream", "seedream-4-5-251128", "size", "4K"),
+    ("ApiyiGptImage", "gpt-image-1", "background", "transparent"),
+    ("ApiyiNanoBanana", "gemini-3-pro-image-preview-4k", "image_size", "4K"),
+    ("ApiyiSeedance", "doubao-seedance-2-5-260628", "resolution", "1080p"),
 ]
 
 

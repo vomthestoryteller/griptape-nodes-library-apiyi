@@ -13,6 +13,7 @@ from griptape_nodes.traits.options import Options
 
 from griptape_nodes_library_apiyi.apiyi_client import ApiyiRequest
 from griptape_nodes_library_apiyi.apiyi_image_node import GENERATIONS_PATH, ApiyiImageNode
+from griptape_nodes_library_apiyi.apiyi_model_catalog import SEEDREAM_MODELS
 
 __all__ = ["ApiyiSeedream"]
 
@@ -48,7 +49,7 @@ def _spec(model: str) -> SeedreamSpec:
 class ApiyiSeedream(ApiyiImageNode):
     """Generate or edit images with Seedream models through APIYI."""
 
-    MODEL_CHOICES: ClassVar[list[str]] = list(MODEL_SPECS)
+    MODEL_CHOICES: ClassVar[list[str]] = SEEDREAM_MODELS
     DEFAULT_MODEL: ClassVar[str] = DEFAULT_MODEL
     MAX_INPUT_IMAGES: ClassVar[int] = 10
     DEFAULT_FILENAME: ClassVar[str] = "apiyi_seedream.jpg"
