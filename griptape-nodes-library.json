@@ -1,0 +1,115 @@
+{
+    "name": "APIYI",
+    "library_schema_version": "0.14.0",
+    "settings": [
+        {
+            "description": "API key for the nodes in this library. Get it at https://api.apiyi.com/token",
+            "category": "app_events.on_app_initialization_complete",
+            "contents": {
+                "secrets_to_register": {
+                    "APIYI_API_KEY": ""
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "author": "vomthestoryteller",
+        "description": "Chat models and image generation through the APIYI model gateway.",
+        "library_version": "0.1.2",
+        "engine_version": "0.105.0",
+        "tags": [
+            "Griptape",
+            "AI",
+            "APIYI"
+        ],
+        "dependencies": {
+            "pip_dependencies": []
+        }
+    },
+    "categories": [
+        {
+            "chat": {
+                "color": "border-green-500",
+                "title": "Chat",
+                "description": "APIYI chat models for the Agent node",
+                "icon": "MessageSquare"
+            }
+        },
+        {
+            "image": {
+                "color": "border-purple-500",
+                "title": "Image",
+                "description": "APIYI image generation and editing",
+                "icon": "Image"
+            }
+        }
+    ],
+    "nodes": [
+        {
+            "class_name": "ApiyiPrompt",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_prompt.py",
+            "metadata": {
+                "category": "chat",
+                "description": "Use an APIYI chat model. Connect the output to the 'prompt model' input of an Agent node.",
+                "display_name": "APIYI Prompt",
+                "tags": ["agent", "llm", "chat", "config", "apiyi"],
+                "icon": "MessageSquare"
+            }
+        },
+        {
+            "class_name": "ApiyiGptImage",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_gpt_image.py",
+            "metadata": {
+                "category": "image",
+                "description": "Generate or edit images with GPT Image models through APIYI. Supports masks on official models.",
+                "display_name": "APIYI GPT Image",
+                "tags": ["image", "generation", "edit", "gpt-image", "apiyi"],
+                "icon": "Image"
+            }
+        },
+        {
+            "class_name": "ApiyiNanoBanana",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_nano_banana.py",
+            "metadata": {
+                "category": "image",
+                "description": "Generate or edit images with Nano Banana (Gemini image) models through APIYI.",
+                "display_name": "APIYI Nano Banana",
+                "tags": ["image", "generation", "edit", "gemini", "nano banana", "apiyi"],
+                "icon": "Image"
+            }
+        },
+        {
+            "class_name": "ApiyiFlux",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_flux.py",
+            "metadata": {
+                "category": "image",
+                "description": "Generate or edit images with FLUX models through APIYI.",
+                "display_name": "APIYI Flux",
+                "tags": ["image", "generation", "edit", "flux", "apiyi"],
+                "icon": "Image"
+            }
+        },
+        {
+            "class_name": "ApiyiSeedream",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_seedream.py",
+            "metadata": {
+                "category": "image",
+                "description": "Generate, edit, or make image sequences with Seedream models through APIYI.",
+                "display_name": "APIYI Seedream",
+                "tags": ["image", "generation", "edit", "seedream", "apiyi"],
+                "icon": "Image"
+            }
+        },
+        {
+            "class_name": "ApiyiMaiImage",
+            "file_path": "griptape_nodes_library_apiyi/apiyi_mai_image.py",
+            "metadata": {
+                "category": "image",
+                "description": "Generate or edit images with MAI-Image models through APIYI.",
+                "display_name": "APIYI MAI-Image",
+                "tags": ["image", "generation", "edit", "mai-image", "apiyi"],
+                "icon": "Image"
+            }
+        }
+    ]
+}
